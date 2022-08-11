@@ -20,10 +20,6 @@ spec:
       }
     }
 
-    options {}
-
-    tools {}
-
     environment {
       AWS_ROLE_ARN = "arn:aws:iam::189768267137:role/JenkinsPushToECR"
       AWS_WEB_IDENTITY_TOKEN_FILE = credentials('arch-aws-oidc')
