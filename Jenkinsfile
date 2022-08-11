@@ -33,7 +33,7 @@ spec:
       AWS_ECS_TASK_DEFINITION_PATH = './container-definition-update-image.json'
       AWS_ECR_URL = "189768267137.dkr.ecr.us-east-1.amazonaws.com/dbuckman-pipelinetest"
       POM_VERSION = "latest"
-      CONFIG_DATA = [
+      CONFIG_DATA = """[
                     portMappings: [
                         [
                          hostPort: 80,
@@ -41,7 +41,7 @@ spec:
                          containerPort: 8080
                         ]
                     ]
-                ]
+                ]"""
     }
 
     stages {
