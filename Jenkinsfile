@@ -39,9 +39,18 @@ spec:
         stage('Deploy in ECS') {
           steps {
             container('awscli') {
+                def data = [
+                    portMappings: [
+                        [
+                         hostPort: 80,
+                         protocol: "tcp",
+                         containerPort: 8080
+                        ]
+                    ]
+                ]
+                writeJSON(file: 'config.json', json: data)
                 script {
-                    updateContainerDefinitionJsonWithImageVersion()
-                    sh("/usr/local/bin/aws ecs register-task-definition --region ${AWS_REGION} --family ${AWS_ECS_TASK_DEFINITION} --execution-role-arn ${AWS_ROLE_ARN} --requires-compatibilities ${AWS_ECS_COMPATIBILITY} --network-mode ${AWS_ECS_NETWORK_MODE} --memory ${AWS_ECS_MEMORY} --container-definitions file://${AWS_ECS_TASK_DEFINITION_PATH}")
+                    sh("/usr/local/bin/aws ecs register-task-definition --region ${AWS_REGION} --family ${AWS_ECS_TASK_DEFINITION} --execution-role-arn ${AWS_ROLE_ARN} --requires-compatibilities ${AWS_ECS_COMPATIBILITY} --network-mode ${AWS_ECS_NETWORK_MODE} --memory ${AWS_ECS_MEMORY} --container-definitions file://config.json")
                     def taskRevision = sh(script: "/usr/local/bin/aws ecs describe-task-definition --task-definition ${AWS_ECS_TASK_DEFINITION} | egrep \"revision\" | tr \"/\" \" \" | awk '{print \$2}' | sed 's/\"\$//'", returnStdout: true)
                     sh("/usr/local/bin/aws ecs update-service --cluster ${AWS_ECS_CLUSTER} --service ${AWS_ECS_SERVICE} --task-definition ${AWS_ECS_TASK_DEFINITION}:${taskRevision}")
                 }
@@ -49,11 +58,4 @@ spec:
           }
         }
     }
-}
-
-def updateContainerDefinitionJsonWithImageVersion() {
-    def containerDefinitionJson = readJSON file: AWS_ECS_TASK_DEFINITION_PATH, returnPojo: true
-    containerDefinitionJson[0]['image'] = "${AWS_ECR_URL}:${POM_VERSION}".inspect()
-    echo "task definiton json: ${containerDefinitionJson}"
-    writeJSON file: AWS_ECS_TASK_DEFINITION_PATH, json: containerDefinitionJson
 }
