@@ -31,8 +31,10 @@ spec:
 
     stages {
         stage('Deploy in ECS') {
-          container('awscli') {
-            sh 'aws sts get-caller-identity'
+          steps {
+            container('awscli') {
+                sh 'aws sts get-caller-identity'
+            }
           }
         }
     }
