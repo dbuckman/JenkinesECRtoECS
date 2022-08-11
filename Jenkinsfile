@@ -33,13 +33,7 @@ spec:
       AWS_ECS_TASK_DEFINITION_PATH = './container-definition-update-image.json'
       AWS_ECR_URL = "189768267137.dkr.ecr.us-east-1.amazonaws.com/dbuckman-pipelinetest"
       POM_VERSION = "latest"
-    }
-
-    stages {
-        stage('Deploy in ECS') {
-          steps {
-            container('awscli') {
-                def data = [
+      CONFIG_DATA = [
                     portMappings: [
                         [
                          hostPort: 80,
@@ -48,6 +42,12 @@ spec:
                         ]
                     ]
                 ]
+    }
+
+    stages {
+        stage('Deploy in ECS') {
+          steps {
+            container('awscli') { 
                 writeJSON(file: 'config.json', json: data)
                 script {
                     sh("/usr/local/bin/aws ecs register-task-definition --region ${AWS_REGION} --family ${AWS_ECS_TASK_DEFINITION} --execution-role-arn ${AWS_ROLE_ARN} --requires-compatibilities ${AWS_ECS_COMPATIBILITY} --network-mode ${AWS_ECS_NETWORK_MODE} --memory ${AWS_ECS_MEMORY} --container-definitions file://config.json")
