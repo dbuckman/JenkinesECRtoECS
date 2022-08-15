@@ -29,7 +29,7 @@ spec:
       AWS_ECS_COMPATIBILITY = 'FARGATE'
       AWS_ECS_NETWORK_MODE = 'awsvpc'
       AWS_ECS_MEMORY = '512'
-      AWS_ECS_CLUSTER = "dbuckman-demo"
+      AWS_ECS_CLUSTER = "dbuckman-cluster"
       AWS_ECS_TASK_DEFINITION_PATH = './container-definition-update-image.json'
       AWS_ECR_URL = "189768267137.dkr.ecr.us-east-1.amazonaws.com/dbuckman-pipelinetest"
       POM_VERSION = "latest"
