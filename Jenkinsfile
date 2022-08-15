@@ -24,8 +24,8 @@ spec:
       AWS_ROLE_ARN = "arn:aws:iam::189768267137:role/JenkinsPushToECR"
       AWS_WEB_IDENTITY_TOKEN_FILE = credentials('arch-aws-oidc')
       AWS_REGION = "us-east-1"
-      AWS_ECS_SERVICE = "dbuckman-app-demo"
-      AWS_ECS_TASK_DEFINITION = "dbuckman-taskdefinition"
+      AWS_ECS_SERVICE = "demo-service"
+      AWS_ECS_TASK_DEFINITION = "sample-app"
       AWS_ECS_COMPATIBILITY = 'FARGATE'
       AWS_ECS_NETWORK_MODE = 'awsvpc'
       AWS_ECS_MEMORY = '512'
@@ -52,10 +52,7 @@ spec:
           steps {
             container('awscli') { 
                 script {
-                    sh("echo '${CONFIG_DATA}' > ./config.json")
-                    sh("/usr/local/bin/aws ecs register-task-definition --region ${AWS_REGION} --family ${AWS_ECS_TASK_DEFINITION} --execution-role-arn ${AWS_ROLE_ARN} --requires-compatibilities ${AWS_ECS_COMPATIBILITY} --network-mode ${AWS_ECS_NETWORK_MODE} --cpu 256 --memory ${AWS_ECS_MEMORY} --container-definitions file://config.json")
-                    def taskRevision = sh(script: "/usr/local/bin/aws ecs describe-task-definition --task-definition ${AWS_ECS_TASK_DEFINITION} | egrep \"revision\" | tr \"/\" \" \" | awk '{print \$2}' | sed 's/\"\$//'", returnStdout: true)
-                    sh("/usr/local/bin/aws ecs update-service --cluster ${AWS_ECS_CLUSTER} --service ${AWS_ECS_SERVICE} --task-definition ${AWS_ECS_TASK_DEFINITION}:${taskRevision}")
+                    sh("/usr/local/bin/aws ecs update-service --cluster ${AWS_ECS_CLUSTER} --service ${AWS_ECS_SERVICE} --task-definition ${AWS_ECS_TASK_DEFINITION}:2")
                 }
             }
           }
