@@ -76,7 +76,7 @@ spec:
                     containerDefinitionJson[0]['image'] = "${AWS_ECR_URL}:${ECR_VERSION}".inspect()
                     writeFile(file: 'task.json', json: containerDefinitionJson)
                     
-                    def taskRevision = sh("/usr/local/bin/aws ecs describe-task-definition --task-definition sample-app | egrep \"revision\" | awk '{print $2}' | sed \"s/,//g\"", returnStdout: true)
+                    def taskRevision = sh("/usr/local/bin/aws ecs describe-task-definition --task-definition sample-app | egrep \"revision\" | awk '{print \$2}' | sed \"s/,//g\"", returnStdout: true)
                     sh("/usr/local/bin/aws ecs update-service --cluster ${AWS_ECS_CLUSTER} --service ${AWS_ECS_SERVICE} --task-definition ${AWS_ECS_TASK_DEFINITION}:${taskRevision}")
                 }
             }
