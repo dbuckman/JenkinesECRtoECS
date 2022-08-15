@@ -75,6 +75,7 @@ spec:
                     sh("cat > task.json <<- EOM\n${CONFIG_DATA}\nEOM")
                     sh("jq '.containerDefinitions[0].image = \"${AWS_ECR_URL}:${ECR_VERSION}\"' task.json > task2.json")
                     sh("mv task2.json task.json")
+                    sh("cat task.json")
 
                     sh("/usr/local/bin/aws ecs register-task-definition --execution-role-arn ${AWS_ROLE_ECS_ARN} --cli-input-json file://task.json")
                     def taskRevision = sh(script: "/usr/local/bin/aws ecs describe-task-definition --task-definition sample-app | egrep \"revision\" | awk '{print \$2}' | sed 's/,//g'", returnStdout: true)
