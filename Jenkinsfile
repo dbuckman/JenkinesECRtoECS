@@ -71,7 +71,7 @@ spec:
                 script {
                     def ECR_VERSION = sh(script: "/usr/local/bin/aws ecr describe-images --region ${AWS_REGION} --repository-name ${AWS_ECR_IMAGE} --output text --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[*]' | tr '\t' '\n' | tail -1", returnStdout: true)
                     writeFile(file: 'task.json', text: CONFIG_DATA)
-                    def containerDefinitionJson = readJSON file: task.json, returnPojo: true
+                    def containerDefinitionJson = readJSON(file: 'task.json', returnPojo: true)
                     containerDefinitionJson[0]['image'] = "${AWS_ECR_URL}:${ECR_VERSION}".inspect()
                     writeFile(file: 'task.json', json: containerDefinitionJson)
                     
