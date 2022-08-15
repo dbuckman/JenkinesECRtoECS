@@ -72,7 +72,7 @@ spec:
                 script {
                     sh("yum install -y less groff jq")
                     def ECR_VERSION = sh(script: "/usr/local/bin/aws ecr describe-images --region ${AWS_REGION} --repository-name ${AWS_ECR_IMAGE} --output text --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[*]' | tr '\t' '\n' | tail -1", returnStdout: true)
-                    sh("cat > task.json <<- EOM\n${CONFIG_DATA}\nEOM")
+                    sh("cat > task.json <<- EOM\n${CONFIG_DATA}EOM")
                     sh("jq '.containerDefinitions[0].image = \"${AWS_ECR_URL}:${ECR_VERSION}\"' task.json > task2.json")
                     sh("mv task2.json task.json")
                     sh("cat task.json")
