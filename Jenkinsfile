@@ -70,10 +70,9 @@ spec:
             container('awscli') { 
                 script {
                     def ECR_VERSION = sh(script: "/usr/local/bin/aws ecr describe-images --region ${AWS_REGION} --repository-name ${AWS_ECR_IMAGE} --output text --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[*]' | tr '\t' '\n' | tail -1", returnStdout: true)
-                    writeFile(file: 'task.json', text: CONFIG_DATA)
-                    def containerDefinitionJson = readJSON(file: 'task.json', returnPojo: true)
-                    containerDefinitionJson[0]['image'] = "${AWS_ECR_URL}:${ECR_VERSION}".inspect()
-                    writeFile(file: 'task.json', json: containerDefinitionJson)
+                    
+                    sh("echo ${CONFIG_DATA} > task.json")
+                    sh("jq '.containerDefinitions[0].image = ${AWS_ECR_URL}:${ECR_VERSION}' task.json|sponge task.json")
                     
                     def taskRevision = sh(script: "/usr/local/bin/aws ecs describe-task-definition --task-definition sample-app | egrep \"revision\" | awk '{print \$2}' | sed 's/,//g'", returnStdout: true)
                     sh("/usr/local/bin/aws ecs update-service --cluster ${AWS_ECS_CLUSTER} --service ${AWS_ECS_SERVICE} --task-definition ${AWS_ECS_TASK_DEFINITION}:${taskRevision}")
