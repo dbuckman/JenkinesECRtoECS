@@ -34,13 +34,14 @@ spec:
       AWS_ECS_TASK_DEFINITION_PATH = './container-definition-update-image.json'
       AWS_ECR_URL = "189768267137.dkr.ecr.us-east-1.amazonaws.com/dbuckman-pipelinetest"
       AWS_ECR_IMAGE = "dbuckman-pipelinetest"
+      AWS_ECR_IMAGE_VERSION = "latest"
       CONFIG_DATA = """{
     "family": "sample-app",
     "networkMode": "awsvpc",
     "containerDefinitions": [
         {
             "name": "demo-app",
-            "image": "189768267137.dkr.ecr.us-east-1.amazonaws.com/dbuckman-pipelinetest:latest",
+            "image": "",
             "portMappings": [
                 {
                     "containerPort": 8080,
@@ -71,9 +72,9 @@ spec:
             container('awscli') { 
                 script {
                     sh("yum install -y less groff jq")
-                    def ECR_VERSION = sh(script:"/usr/local/bin/aws ecr describe-images --region ${AWS_REGION} --repository-name ${AWS_ECR_IMAGE} --output text --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[*]'| sed 's/\t/\n/g' | tail -1", returnStdout: true)
+                    // def ECR_VERSION = sh(script:"/usr/local/bin/aws ecr describe-images --region ${AWS_REGION} --repository-name ${AWS_ECR_IMAGE} --output text --query 'sort_by(imageDetails,& imagePushedAt)[*].imageTags[*]'| sed 's/\t/\n/g' | tail -1", returnStdout: true)
                     sh("cat > task.json <<- EOM\n${CONFIG_DATA}\nEOM")
-                    sh("jq '.containerDefinitions[0].image = \"${AWS_ECR_URL}:${ECR_VERSION}\"' task.json > task2.json")
+                    sh("jq '.containerDefinitions[0].image = \"${AWS_ECR_URL}:${AWS_ECR_IMAGE_VERSION}\"' task.json > task2.json")
                     sh("mv task2.json task.json")
                     sh("cat task.json")
 
